@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/gob"
 	"strconv"
 	"time"
 )
@@ -45,4 +46,24 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 // NewGenesisBlock 创世区块创建
 func NewGenesisBlock() *Block {
 	return NewBlock("Genesis Block", []byte{})
+}
+
+// Serialize 序列化区块
+func (b *Block) Serialize() []byte {
+	var result bytes.Buffer
+	// 编码器
+	encoder := gob.NewEncoder(&result)
+	// 编码
+	encoder.Encode(b)
+	return result.Bytes()
+}
+
+// DeSerialize 区块数据还原为block
+func DeSerialize(d []byte) *Block {
+	var block Block
+	// 创建解码器
+	decoder := gob.NewDecoder(bytes.NewReader(d))
+	// 解析区块数据
+	decoder.Decode(&block)
+	return &block
 }

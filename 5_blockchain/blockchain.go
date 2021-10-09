@@ -25,14 +25,17 @@ func main() {
 	bc := NewBlockChain()
 	bc.AddBlock("1111")
 	bc.AddBlock("2222")
-	bc.AddBlock("3333")
-	bc.AddBlock("4444")
+	//bc.AddBlock("3333")
+	//bc.AddBlock("4444")
 
 	//区块链遍历
 	for _, block := range bc.blocks{
 		fmt.Printf("前一块的hash:%x\n",block.PreBlockHash)
 		fmt.Printf("数据：%s\n",block.Data)
 		fmt.Printf("Hash:%x\n",block.Hash)
+		fmt.Printf("Nonce:%d\n",block.Nonce)
+		pow := NewProofOfWork(block)
+		fmt.Printf("Pow: %t\n",pow.Validate())
 		fmt.Println()
 	}
 }

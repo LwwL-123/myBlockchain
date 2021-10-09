@@ -13,16 +13,15 @@ type Block struct {
 	Data         []byte //数据
 	PreBlockHash []byte //前一块的hash
 	Hash         []byte //当前块hash
+	Nonce        int64  // 随机值
 }
-
-
 
 // SetHash 区块内部设置hash的方法
 func (b *Block) SetHash() {
 	// 将时间戳转换为[]byte, strconv.FormatInt用于将整型数据转换成指定进制并以字符串的形式返回
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
 	// 将前块的hash、交易信息、时间戳联合到一起
-	headers := bytes.Join([][]byte{b.PreBlockHash,b.Data,timestamp},[]byte{})
+	headers := bytes.Join([][]byte{b.PreBlockHash, b.Data, timestamp}, []byte{})
 	// 计算本块的hash值
 	hash := sha256.Sum256(headers)
 	b.Hash = hash[:]
@@ -31,12 +30,19 @@ func (b *Block) SetHash() {
 // NewBlock 区块创建，返回指针
 func NewBlock(data string, prevBlockHash []byte) *Block {
 	// 构造Blcok
-	block := &Block{time.Now().Unix(),[]byte(data),prevBlockHash, []byte{}}
-	block.SetHash()
+	block := &Block{time.Now().Unix(), []byte(data), prevBlockHash, []byte{},0}
+	//block.SetHash()
+
+	// 先挖矿
+	pow := NewProofOfWork(block)
+	nonce, hash := pow.Run()
+	// 设置hash和nonce
+	block.Hash = hash
+	block.Nonce = nonce
 	return block
 }
 
 // NewGenesisBlock 创世区块创建
 func NewGenesisBlock() *Block {
-	return NewBlock("Genesis Block",[]byte{})
+	return NewBlock("Genesis Block", []byte{})
 }
